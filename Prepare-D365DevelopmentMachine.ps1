@@ -128,6 +128,8 @@ Else {
         "vscode-azurerm-tools"
         "vscode-powershell"
         "winmerge"
+        "agentransack"
+        "microsoft-edge"
     )
 
     # Install each program
