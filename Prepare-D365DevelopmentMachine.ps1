@@ -18,10 +18,11 @@
 #region Install additional apps using Chocolatey
 
 #update visual studio
+<#
 Start-Process -Wait `
     -FilePath "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe" `
     -ArgumentList 'update --passive --norestart --installpath "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional"'
-
+#>
 
 #install TrudAX
 $repo = "TrudAX/TRUDUtilsD365"
@@ -49,6 +50,9 @@ foreach ($file in $files) {
 Start-Process "InstallToVS.exe" -Verb runAs
 
 
+#install SSD365VSAddIn
+iex (iwr "https://raw.githubusercontent.com/shashisadasivan/SSD365VSAddIn/master/Misc/install.ps1").Content
+<#
 # Set file and folder path for SSMS installer .exe
 $folderpath = "c:\windows\temp"
 $filepath = "$folderpath\SSMS-Setup-ENU.exe"
@@ -79,7 +83,7 @@ Install-Module PSWindowsUpdate
 Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -AutoReboot
 
 #endregion
-
+#>
 
 If (Test-Path -Path "$env:ProgramData\Chocolatey") {
     choco upgrade chocolatey -y -r
@@ -111,23 +115,11 @@ Else {
 
     $packages = @(
         "adobereader"
-        "azure-cli"
-        "azure-data-studio"
-        "azurepowershell"
-        "dotnetcore"
-        "fiddler"
-        "git.install"
-        "googlechrome"
         "notepadplusplus.install"
         "p4merge"
         "7zip"
         "postman"
         "sysinternals"
-        "vscode"
-        "visualstudio-codealignment"
-        "vscode-azurerm-tools"
-        "vscode-powershell"
-        "winmerge"
         "agentransack"
         "microsoft-edge"
     )
@@ -141,7 +133,6 @@ Else {
 }
 
 #endregion
-
 
 #region Installing d365fo.tools
 
@@ -168,11 +159,10 @@ Get-D365Environment -FinancialReporter | Set-Service -StartupType Manual
 Write-Host "Setting Windows Defender rules to speed up compilation time"
 Add-D365WindowsDefenderRules -Silent
 
-
 #endregion
 
 #region Local User Policy
-
+<#
 # Set the password to never expire
 Get-WmiObject Win32_UserAccount -filter "LocalAccount=True" | ? { $_.SID -Like "S-1-5-21-*-500" } | Set-LocalUser -PasswordNeverExpires 1
 
@@ -197,7 +187,7 @@ Else {
 }
 
 #endregion
-
+#>
 #region Privacy
 
 # Disable Windows Telemetry (requires a reboot to take effect)
@@ -228,7 +218,7 @@ If (!(Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search")) {
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "AllowCortana" -Type DWord -Value 0
 
 #endregion
-
+<#
 
 #region Install and run Ola Hallengren's IndexOptimize
 
@@ -378,7 +368,7 @@ If (Test-Path "HKLM:\Software\Microsoft\Microsoft SQL Server\Instance Names\SQL"
 Else {
     Write-Verbose "SQL not installed.  Skipped Ola Hallengren's index optimization"
 }
-
+#>
 #endregion
 
 
@@ -397,7 +387,7 @@ Write-Host "Setting power settings to High Performance"
 powercfg.exe /SetActive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
 #endregion
 
-
+<#
 #region Configure Windows Updates when Windows 10
 
 if ((Get-WmiObject Win32_OperatingSystem).Caption -Like "*Windows 10*") {
@@ -409,5 +399,5 @@ if ((Get-WmiObject Win32_OperatingSystem).Caption -Like "*Windows 10*") {
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config -Name DODownloadMode -Type DWord -Value 1
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization -Name SystemSettingsDownloadMode -Type DWord -Value 3
 }
-
+#>
 #endregion
